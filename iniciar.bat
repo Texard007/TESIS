@@ -1,24 +1,29 @@
 @echo off
-chcp 65001 >nul
+setlocal enabledelayedexpansion
+cd /d "%~dp0"
 title Plataforma de Adopcion de Mascotas - Iniciador
 
 :menu
 cls
 echo ======================================================================
-echo    🐾 PLATAFORMA COLABORATIVA DE ADOPCION DE MASCOTAS (ESTADO ZULIA)
+echo    PLATAFORMA COLABORATIVA DE ADOPCION DE MASCOTAS (ESTADO ZULIA)
 echo ======================================================================
 echo.
 echo [INFO] Tu direccion IP local en red LAN es: 192.168.1.200
-echo [INFO] Los celulares conectados a tu misma red Wi-Fi podran conectarse directamente.
+echo [INFO] Los celulares conectados a tu misma red Wi-Fi podran conectarse.
 echo.
-echo Selecciona como deseas iniciar el sistema:
+echo ======================================================================
+echo                            MENU DE OPCIONES
+echo ======================================================================
 echo.
-echo  [1] Iniciar TODO (Backend API en puerto 4000 + Servidor para Celular)
+echo  [1] Iniciar Servidores (Backend API :4000 + Servidor para Celular)
 echo  [2] Abrir en el Navegador Web (PC)
 echo  [3] Iniciar SOLO el Backend API (Node.js + Express)
-echo  [4] INSTALAR APP EN EL CELULAR (Codigo QR para descarga de APK / Expo Go)
+echo  [4] Instalar la aplicacion en el celular mediante Codigo QR
 echo  [5] Salir
 echo.
+echo ======================================================================
+set "opcion="
 set /p opcion="Elige una opcion (1-5) y presiona Enter: "
 
 if "%opcion%"=="1" goto start_all
@@ -59,22 +64,22 @@ goto menu
 
 :start_instalar
 cls
+chcp 65001 >nul
 call node "%~dp0scripts\show_apk_qr.js"
 echo.
 echo ======================================================================
-echo  ¿Deseas tambien abrir con Expo Go (SDK 58 / v58.0.5)?
-echo  - Presiona [E] o [1] para iniciar Expo Go.
-echo  - Presiona [ENTER] para regresar al menu principal.
+echo  [E] Si deseas iniciar el servidor Metro para Expo Go (v58.0.5)
+echo  [M] Volver al menu principal
 echo ======================================================================
-set /p subopt="Selecciona una opcion: "
+set "subopt="
+set /p subopt="Opcion (E o presiona Enter para menu): "
 if /i "%subopt%"=="E" goto start_expogo
-if "%subopt%"=="1" goto start_expogo
 goto menu
 
 :start_expogo
 cls
 echo ======================================================================
-echo    📲 CODIGO QR PARA EXPO GO (SDK 58 / REACT NATIVE 0.88)
+echo    CODIGO QR PARA EXPO GO (SDK 58 / REACT NATIVE 0.88)
 echo ======================================================================
 echo.
 echo  1. Abre la app Expo Go en tu celular (Version 58.0.5).
