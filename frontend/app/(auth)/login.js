@@ -6,6 +6,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Dimensions,
+  Image,
 } from 'react-native';
 import {
   Text,
@@ -99,10 +100,10 @@ export default function LoginScreen() {
         <View style={[styles.content, isWide && styles.contentWide]}>
           {/* Logo / Header */}
           <View style={styles.header}>
-            <MaterialCommunityIcons
-              name="paw"
-              size={64}
-              color={theme.colors.primary}
+            <Image
+              source={require('../../assets/logo.png')}
+              style={styles.logoImage}
+              resizeMode="contain"
             />
             <Text
               variant="headlineMedium"
@@ -308,6 +309,12 @@ const styles = StyleSheet.create({
   header: {
     alignItems: 'center',
     marginBottom: 24,
+  },
+  logoImage: {
+    width: 96,
+    height: 96,
+    marginBottom: 12,
+    alignSelf: 'center',
   },
   title: {
     fontWeight: '700',

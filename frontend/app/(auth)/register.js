@@ -6,6 +6,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Dimensions,
+  Image,
 } from 'react-native';
 import {
   Text,
@@ -138,10 +139,10 @@ export default function RegisterScreen() {
         <View style={[styles.content, isWide && styles.contentWide]}>
           {/* Header */}
           <View style={styles.header}>
-            <MaterialCommunityIcons
-              name="paw"
-              size={48}
-              color={theme.colors.primary}
+            <Image
+              source={require('../../assets/logo.png')}
+              style={{ width: 72, height: 72, marginBottom: 8, alignSelf: 'center' }}
+              resizeMode="contain"
             />
             <Text
               variant="headlineSmall"
