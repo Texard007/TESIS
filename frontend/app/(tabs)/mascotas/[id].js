@@ -555,7 +555,11 @@ export default function MascotaDetail() {
                     <Button
                       mode="contained"
                       icon="heart"
-                      onPress={() => setAdoptDialog(true)}
+                      onPress={() =>
+                        router.push(
+                          `/(tabs)/solicitudes/nueva?mascotaId=${mascota.id_mascota || mascota.id}&mascotaNombre=${encodeURIComponent(mascota.nombre)}`
+                        )
+                      }
                       buttonColor={theme.colors.primary}
                       textColor={theme.colors.onPrimary}
                       style={styles.actionButton}
@@ -710,49 +714,6 @@ export default function MascotaDetail() {
         </View>
       </ScrollView>
 
-      {/* Dialog de adopción */}
-      <Portal>
-        <Dialog
-          visible={adoptDialog}
-          onDismiss={() => setAdoptDialog(false)}
-          style={{ backgroundColor: theme.colors.surface }}
-        >
-          <Dialog.Title style={{ color: theme.colors.onSurface }}>Solicitar Adopción</Dialog.Title>
-          <Dialog.Content>
-            <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant, marginBottom: 16 }}>
-              Cuéntanos por qué quieres adoptar a {mascota.nombre}:
-            </Text>
-            <TextInput
-              label="Motivo de adopción *"
-              value={motivo}
-              onChangeText={setMotivo}
-              mode="outlined"
-              multiline
-              numberOfLines={3}
-              style={styles.dialogInput}
-              outlineColor={theme.colors.outline}
-              activeOutlineColor={theme.colors.primary}
-            />
-            <TextInput
-              label="Experiencia con mascotas"
-              value={experienciaAdop}
-              onChangeText={setExperienciaAdop}
-              mode="outlined"
-              multiline
-              numberOfLines={3}
-              style={styles.dialogInput}
-              outlineColor={theme.colors.outline}
-              activeOutlineColor={theme.colors.primary}
-            />
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button onPress={() => setAdoptDialog(false)} textColor={theme.colors.onSurfaceVariant}>Cancelar</Button>
-            <Button onPress={handleAdopt} loading={adoptLoading} disabled={adoptLoading} textColor={theme.colors.primary}>
-              Enviar Solicitud
-            </Button>
-          </Dialog.Actions>
-        </Dialog>
-      </Portal>
 
       <Snackbar
         visible={snackVisible}
