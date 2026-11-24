@@ -30,7 +30,7 @@ const ROLES = [
 export default function RegisterScreen() {
   const theme = useTheme();
   const router = useRouter();
-  const { register } = useAuth();
+  const { register, registerOffline } = useAuth();
 
   const [nombre, setNombre] = useState('');
   const [email, setEmail] = useState('');
@@ -103,27 +103,64 @@ export default function RegisterScreen() {
     try {
       const result = await register(userData);
       if (result.success) {
-        setSuccess('¡Registro exitoso! Redirigiendo...');
+        setSuccess('¡Registro exitoso! Entrando a la plataforma...');
         setTimeout(() => {
           router.replace('/(tabs)/mascotas');
-        }, 1500);
+        }, 800);
+        return;
       } else {
         setError(result.message || 'Error al registrar. Intenta de nuevo.');
       }
     } catch (err) {
-      const response = err.response?.data;
-      if (response?.message) {
-        setError(response.message);
-      } else {
-        // Si no hay conexión con el backend, registrar localmente y entrar a la app
-        try {
-          await register({ nombre, email, password, telefono, direccion, rol });
+      // Si el servidor backend no responde, crear cuenta localmente de forma inmediata
+      try {
+        await registerOffline(userData);
+        setSuccess('¡Cuenta creada sin conexión! Entrando a la plataforma...');
+        setTimeout(() => {
           router.replace('/(tabs)/mascotas');
-          return;
-        } catch (e2) {
-          setError('Error al registrar. Intenta de nuevo.');
-        }
+        }, 800);
+        return;
+      } catch (offlineErr) {
+        setError('Error al registrar. Intenta de nuevo.');
       }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRegisterOfflineDirect = async () => {
+    setError('');
+    setSuccess('');
+
+    const validationError = validate();
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
+    const userData = {
+      nombre: nombre.trim(),
+      email: email.trim().toLowerCase(),
+      password,
+      telefono: telefono.trim(),
+      direccion: direccion.trim(),
+      rol,
+      organizacion: organizacion.trim() || undefined,
+      experiencia: experiencia.trim() || undefined,
+      ingresos_aproximados: ingresosAproximados ? parseFloat(ingresosAproximados) : undefined,
+      especialidad: especialidad.trim() || undefined,
+      licencia: licencia.trim() || undefined,
+    };
+
+    setLoading(true);
+    try {
+      await registerOffline(userData);
+      setSuccess('¡Cuenta creada sin conexión! Entrando a la plataforma...');
+      setTimeout(() => {
+        router.replace('/(tabs)/mascotas');
+      }, 600);
+    } catch (e) {
+      setError('Error al registrar en modo offline.');
     } finally {
       setLoading(false);
     }
@@ -437,6 +474,17 @@ export default function RegisterScreen() {
                 buttonColor={theme.colors.primary}
               >
                 {loading ? 'Registrando...' : 'Crear cuenta'}
+              </Button>
+
+              <Button
+                mode="outlined"
+                icon="cloud-off-outline"
+                onPress={handleRegisterOfflineDirect}
+                disabled={loading}
+                style={{ marginTop: 10, borderColor: theme.colors.primary }}
+                textColor={theme.colors.primary}
+              >
+                Registrar y Entrar en Modo Offline
               </Button>
 
               <View style={styles.loginRow}>

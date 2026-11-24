@@ -194,22 +194,71 @@ export function AuthProvider({ children }) {
     };
   }, []);
 
-  const register = useCallback(async (userData) => {
-    const result = await authService.register(userData);
-    if (result.success && result.data) {
-      const { token: newToken, user: userObj, usuario } = result.data;
-      const currentUser = userObj || usuario;
-      if (newToken) {
-        await AsyncStorage.setItem('auth_token', newToken);
-        setToken(newToken);
-      }
-      if (currentUser) {
-        await AsyncStorage.setItem('user_data', JSON.stringify(currentUser));
-        setUser(currentUser);
-      }
-    }
-    return result;
+  const registerOffline = useCallback(async (userData) => {
+    const cleanEmail = (userData.email || userData.correo || '').trim().toLowerCase();
+    const cleanNombre = (userData.nombre || 'Usuario').trim();
+    const rol = (userData.rol || 'adoptante').toLowerCase();
+
+    const offlineUser = {
+      id_usuario: Date.now(),
+      nombre: cleanNombre,
+      correo: cleanEmail || 'usuario@adopcionzulia.org',
+      rol,
+      telefono: userData.telefono || '+58 414-0000000',
+      direccion: userData.direccion || 'Maracaibo, Zulia',
+      estado: 'activo',
+      organizacion: userData.organizacion || undefined,
+      experiencia: userData.experiencia || undefined,
+      especialidad: userData.especialidad || undefined,
+      licencia: userData.licencia || undefined,
+      ingresos_aproximados: userData.ingresos_aproximados || undefined,
+      modo_offline: true,
+    };
+
+    const offlineToken = `offline-token-${Date.now()}`;
+    await AsyncStorage.setItem('auth_token', offlineToken);
+    await AsyncStorage.setItem('user_data', JSON.stringify(offlineUser));
+    setToken(offlineToken);
+    setUser(offlineUser);
+
+    return {
+      success: true,
+      offline: true,
+      data: { user: offlineUser, usuario: offlineUser, token: offlineToken },
+      message: 'Cuenta registrada exitosamente (Modo Offline)',
+    };
   }, []);
+
+  const register = useCallback(async (userData) => {
+    try {
+      const result = await authService.register(userData);
+      if (result.success && result.data) {
+        const { token: newToken, user: userObj, usuario } = result.data;
+        const currentUser = userObj || usuario;
+        if (newToken) {
+          await AsyncStorage.setItem('auth_token', newToken);
+          setToken(newToken);
+        }
+        if (currentUser) {
+          await AsyncStorage.setItem('user_data', JSON.stringify(currentUser));
+          setUser(currentUser);
+        }
+      }
+      return result;
+    } catch (err) {
+      const isNetworkError =
+        err.message === 'Network Error' ||
+        err.code === 'ERR_NETWORK' ||
+        err.code === 'ECONNABORTED' ||
+        !err.response;
+
+      if (isNetworkError) {
+        // Fallback automático si el backend está apagado o no hay internet
+        return await registerOffline(userData);
+      }
+      throw err;
+    }
+  }, [registerOffline]);
 
   const logout = useCallback(async () => {
     await AsyncStorage.removeItem('auth_token');
@@ -243,6 +292,7 @@ export function AuthProvider({ children }) {
     loginOffline,
     loginDemo,
     register,
+    registerOffline,
     logout,
     refreshUser,
   };
