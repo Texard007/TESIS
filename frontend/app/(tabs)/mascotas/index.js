@@ -39,7 +39,7 @@ export default function MascotasIndex() {
   const isWide = width > 768;
   const numColumns = isWide ? 3 : 1;
 
-  const canCreate = rol === 'rescatista' || rol === 'veterinario';
+  const canCreate = rol === 'rescatista' || rol === 'veterinario' || rol === 'administrador' || rol === 'admin';
 
   const fetchMascotas = useCallback(
     async (pageNum = 1, append = false) => {
@@ -159,7 +159,7 @@ export default function MascotasIndex() {
       ) : (
         <FlatList
           data={mascotas}
-          keyExtractor={(item) => item._id || item.id || Math.random().toString()}
+          keyExtractor={(item) => String(item.id_mascota || item._id || item.id || Math.random())}
           renderItem={({ item }) => (
             <PetCard mascota={item} onPress={handlePetPress} />
           )}

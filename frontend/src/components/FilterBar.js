@@ -13,7 +13,7 @@ const ESPECIES = [
 
 const ESTADOS = [
   { key: '', label: 'Todos' },
-  { key: 'disponible', label: 'Disponible' },
+  { key: 'en_adopcion', label: 'Disponible' },
   { key: 'en_proceso', label: 'En proceso' },
   { key: 'adoptado', label: 'Adoptado' },
   { key: 'en_tratamiento', label: 'En tratamiento' },
