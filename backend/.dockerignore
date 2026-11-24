@@ -1,0 +1,42 @@
+# Dependencias (se instalan en el build)
+node_modules
+
+# Archivos de desarrollo
+.env
+.env.*
+!.env.example
+nodemon.json
+*.log
+
+# Git
+.git
+.gitignore
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Tests
+__tests__
+*.test.js
+*.spec.js
+coverage
+
+# Uploads locales (se montan como volumen)
+uploads/*
+!uploads/.gitkeep
+
+# Documentación
+README.md
+docs/

@@ -1,0 +1,38 @@
+{
+  "expo": {
+    "name": "Adopción de Mascotas",
+    "slug": "adopcion-mascotas",
+    "version": "1.0.0",
+    "sdkVersion": "58.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "adopcion-mascotas",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#FFF3E0"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.adopcion.mascotas"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#FFF3E0"
+      },
+      "package": "com.adopcion.mascotas"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single",
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": ["expo-router", "expo-image-picker"],
+    "experiments": {
+      "typedRoutes": false
+    }
+  }
+}
