@@ -37,7 +37,6 @@ export default function PetCard({ mascota, onPress }) {
   const theme = useTheme();
   const { width } = Dimensions.get('window');
   const isWide = width > 768;
-  const cardWidth = isWide ? (width - 80) / 3 : width - 32;
 
   const foto =
     mascota.foto_principal ||
@@ -51,52 +50,66 @@ export default function PetCard({ mascota, onPress }) {
   const edadDisplay = mascota.edad_aprox || (mascota.edad ? `${mascota.edad} años` : 'Edad desconocida');
 
   return (
-    <Pressable onPress={() => onPress && onPress(mascota)} style={{ width: cardWidth, marginBottom: 16 }}>
-      <Card style={[styles.card, { backgroundColor: theme.colors.surface }]} elevation={2}>
-        <Card.Cover
-          source={{ uri: foto }}
-          style={styles.cover}
-          resizeMode="cover"
-        />
-        <Card.Content style={styles.content}>
-          <View style={styles.headerRow}>
-            <View style={styles.nameRow}>
-              <MaterialCommunityIcons
-                name={especieIcons[especie] || 'paw'}
-                size={20}
-                color={theme.colors.primary}
-              />
-              <Text variant="titleMedium" style={[styles.name, { color: theme.colors.onSurface }]}>
-                {mascota.nombre}
-              </Text>
+    <View style={[styles.cardWrapper, isWide ? styles.cardWrapperWide : styles.cardWrapperMobile]}>
+      <Pressable onPress={() => onPress && onPress(mascota)} style={{ flex: 1 }}>
+        <Card style={[styles.card, { backgroundColor: theme.colors.surface }]} elevation={2}>
+          <Card.Cover
+            source={{ uri: foto }}
+            style={styles.cover}
+            resizeMode="cover"
+          />
+          <Card.Content style={styles.content}>
+            <View style={styles.headerRow}>
+              <View style={styles.nameRow}>
+                <MaterialCommunityIcons
+                  name={especieIcons[especie] || 'paw'}
+                  size={20}
+                  color={theme.colors.primary}
+                />
+                <Text variant="titleMedium" style={[styles.name, { color: theme.colors.onSurface }]}>
+                  {mascota.nombre}
+                </Text>
+              </View>
+              <Chip
+                compact
+                style={[styles.chip, { backgroundColor: estadoColors[estado] || '#9E9E9E' }]}
+                textStyle={styles.chipText}
+              >
+                {estadoLabels[estado] || estado}
+              </Chip>
             </View>
-            <Chip
-              compact
-              style={[styles.chip, { backgroundColor: estadoColors[estado] || '#9E9E9E' }]}
-              textStyle={styles.chipText}
-            >
-              {estadoLabels[estado] || estado}
-            </Chip>
-          </View>
-          <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }} numberOfLines={1}>
-            {mascota.raza || 'Mestizo'} • {edadDisplay} {mascota.tamano ? `• ${mascota.tamano}` : ''}
-          </Text>
-          {mascota.descripcion && (
-            <Text
-              variant="bodySmall"
-              style={{ color: theme.colors.onSurfaceVariant, marginTop: 4 }}
-              numberOfLines={2}
-            >
-              {mascota.descripcion}
+            <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }} numberOfLines={1}>
+              {mascota.raza || 'Mestizo'} • {edadDisplay} {mascota.tamano ? `• ${mascota.tamano}` : ''}
             </Text>
-          )}
-        </Card.Content>
-      </Card>
-    </Pressable>
+            {mascota.descripcion && (
+              <Text
+                variant="bodySmall"
+                style={{ color: theme.colors.onSurfaceVariant, marginTop: 4 }}
+                numberOfLines={2}
+              >
+                {mascota.descripcion}
+              </Text>
+            )}
+          </Card.Content>
+        </Card>
+      </Pressable>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  cardWrapper: {
+    marginBottom: 16,
+  },
+  cardWrapperWide: {
+    flex: 1,
+    marginHorizontal: 8,
+    minWidth: 280,
+    maxWidth: 400,
+  },
+  cardWrapperMobile: {
+    width: '100%',
+  },
   card: {
     borderRadius: 12,
     overflow: 'hidden',

@@ -90,17 +90,20 @@ export default function FilterBar({
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 16,
-    paddingTop: 8,
+    paddingTop: 12,
     paddingBottom: 4,
+    width: '100%',
+    maxWidth: 1200,
+    alignSelf: 'center',
   },
   searchbar: {
-    marginBottom: 8,
+    marginBottom: 10,
     elevation: 1,
     borderRadius: 12,
   },
   chipRow: {
     flexDirection: 'row',
-    marginBottom: 6,
+    marginBottom: 8,
   },
   chip: {
     marginRight: 8,

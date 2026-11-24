@@ -184,6 +184,9 @@ const styles = StyleSheet.create({
   },
   list: {
     padding: 16,
+    maxWidth: 900,
+    width: '100%',
+    alignSelf: 'center',
   },
   card: {
     borderRadius: 12,

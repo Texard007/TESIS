@@ -3,7 +3,7 @@ import {
   View,
   StyleSheet,
   FlatList,
-  Dimensions,
+  useWindowDimensions,
   RefreshControl,
 } from 'react-native';
 import { Text, Button, FAB, useTheme } from 'react-native-paper';
@@ -35,9 +35,10 @@ export default function MascotasIndex() {
   const [especieFilter, setEspecieFilter] = useState('');
   const [estadoFilter, setEstadoFilter] = useState('');
 
-  const { width } = Dimensions.get('window');
-  const isWide = width > 768;
-  const numColumns = isWide ? 3 : 1;
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 1024;
+  const isTablet = width >= 680 && width < 1024;
+  const numColumns = isDesktop ? 3 : (isTablet ? 2 : 1);
 
   const canCreate = rol === 'rescatista' || rol === 'veterinario' || rol === 'administrador' || rol === 'admin';
 
@@ -213,10 +214,16 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   list: {
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    paddingBottom: 80,
+    width: '100%',
+    maxWidth: 1200,
+    alignSelf: 'center',
   },
   row: {
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
+    gap: 12,
   },
   footer: {
     padding: 16,
@@ -224,8 +231,9 @@ const styles = StyleSheet.create({
   },
   fab: {
     position: 'absolute',
-    right: 16,
-    bottom: 16,
+    right: 24,
+    bottom: 24,
     borderRadius: 16,
+    elevation: 4,
   },
 });

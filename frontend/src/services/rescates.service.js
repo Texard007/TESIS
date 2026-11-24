@@ -1,4 +1,14 @@
 import api from './api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const isOffline = async () => {
+  try {
+    const token = await AsyncStorage.getItem('auth_token');
+    return !token || token.startsWith('offline-') || token.startsWith('demo-');
+  } catch (e) {
+    return true;
+  }
+};
 
 const MOCK_RESCATES = [
   {
@@ -19,19 +29,37 @@ const MOCK_RESCATES = [
 
 const rescatesService = {
   crear: async (rescateData) => {
+    const newRes = {
+      id_rescate: Date.now(),
+      ...rescateData,
+      fecha_rescate: new Date().toISOString().split('T')[0],
+      rescatista_nombre: 'Rescatista Actual',
+    };
+    if (await isOffline()) {
+      MOCK_RESCATES.unshift(newRes);
+      return {
+        success: true,
+        data: newRes,
+        message: 'Rescate registrado correctamente',
+      };
+    }
     try {
       const response = await api.post('/rescates', rescateData);
       return response.data;
     } catch (e) {
+      MOCK_RESCATES.unshift(newRes);
       return {
         success: true,
-        data: { id_rescate: Date.now(), ...rescateData, fecha_rescate: new Date().toISOString() },
+        data: newRes,
         message: 'Rescate registrado correctamente',
       };
     }
   },
 
   listar: async (params = {}) => {
+    if (await isOffline()) {
+      return { success: true, data: { rescates: MOCK_RESCATES } };
+    }
     try {
       const response = await api.get('/rescates', { params });
       return response.data;

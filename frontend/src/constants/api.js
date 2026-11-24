@@ -20,10 +20,10 @@ const getHostIp = () => {
     }
   }
 
-  // 2. Si estamos en navegador web, usar el hostname actual
+  // 2. Si estamos en navegador web, usar el hostname actual (localhost o IP)
   if (typeof window !== 'undefined' && window.location?.hostname) {
     const hostname = window.location.hostname;
-    if (hostname && hostname !== 'localhost') {
+    if (hostname) {
       return hostname;
     }
   }

@@ -473,7 +473,13 @@ function SwitchRow({ label, value, onChange, theme }) {
 
 
 const styles = StyleSheet.create({
-  scrollContent: { padding: 16, paddingBottom: 32 },
+  scrollContent: {
+    padding: 16,
+    paddingBottom: 48,
+    maxWidth: 900,
+    width: '100%',
+    alignSelf: 'center',
+  },
   card: { borderRadius: 12, marginBottom: 12 },
   tabRow: { flexDirection: 'row', borderBottomWidth: 1 },
   tabItem: { flex: 1, alignItems: 'center', paddingVertical: 10 },

@@ -448,13 +448,22 @@ const styles = StyleSheet.create({
   tabRow: {
     flexDirection: 'row',
     borderBottomWidth: 1,
+    maxWidth: 800,
+    width: '100%',
+    alignSelf: 'center',
   },
   tabItem: {
     flex: 1,
     alignItems: 'center',
     paddingVertical: 12,
   },
-  scrollContent: { padding: 16, paddingBottom: 32 },
+  scrollContent: {
+    padding: 16,
+    paddingBottom: 48,
+    maxWidth: 800,
+    width: '100%',
+    alignSelf: 'center',
+  },
   card: { borderRadius: 12, marginBottom: 16 },
   sectionHeader: {
     flexDirection: 'row',

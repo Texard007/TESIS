@@ -4,7 +4,7 @@ import {
   StyleSheet,
   ScrollView,
   Image,
-  Dimensions,
+  useWindowDimensions,
   FlatList,
   Pressable,
   Share,
@@ -202,7 +202,7 @@ export default function MascotaDetail() {
   const [snackMessage, setSnackMessage] = useState('');
   const [snackVisible, setSnackVisible] = useState(false);
 
-  const { width } = Dimensions.get('window');
+  const { width } = useWindowDimensions();
   const isWide = width > 768;
 
   useEffect(() => {

@@ -1,4 +1,14 @@
 import api from './api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const isOffline = async () => {
+  try {
+    const token = await AsyncStorage.getItem('auth_token');
+    return !token || token.startsWith('offline-') || token.startsWith('demo-');
+  } catch (e) {
+    return true;
+  }
+};
 
 const MOCK_REPORTES = {
   usuarios: {
@@ -41,6 +51,9 @@ const MOCK_USUARIOS = [
 
 const adminService = {
   obtenerReportes: async (params = {}) => {
+    if (await isOffline()) {
+      return { success: true, data: MOCK_REPORTES };
+    }
     try {
       const response = await api.get('/admin/reportes', { params });
       return response.data;
@@ -53,6 +66,12 @@ const adminService = {
   },
 
   listarUsuarios: async (params = {}) => {
+    if (await isOffline()) {
+      return {
+        success: true,
+        data: { usuarios: MOCK_USUARIOS, pagination: { total: MOCK_USUARIOS.length, page: 1 } },
+      };
+    }
     try {
       const response = await api.get('/admin/usuarios', { params });
       return response.data;
@@ -65,6 +84,14 @@ const adminService = {
   },
 
   cambiarEstadoUsuario: async (userId, estadoData) => {
+    if (await isOffline()) {
+      const u = MOCK_USUARIOS.find((user) => String(user.id_usuario) === String(userId));
+      if (u) u.estado = estadoData.estado;
+      return {
+        success: true,
+        message: `Estado actualizado a ${estadoData.estado}`,
+      };
+    }
     try {
       const response = await api.patch(`/admin/usuarios/${userId}/estado`, estadoData);
       return response.data;
