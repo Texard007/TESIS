@@ -114,10 +114,15 @@ export default function RegisterScreen() {
       const response = err.response?.data;
       if (response?.message) {
         setError(response.message);
-      } else if (err.message === 'Network Error') {
-        setError('Error de conexión. Verifica tu conexión a internet.');
       } else {
-        setError('Error al registrar. Intenta de nuevo.');
+        // Si no hay conexión con el backend, registrar localmente y entrar a la app
+        try {
+          await register({ nombre, email, password, telefono, direccion, rol });
+          router.replace('/(tabs)/mascotas');
+          return;
+        } catch (e2) {
+          setError('Error al registrar. Intenta de nuevo.');
+        }
       }
     } finally {
       setLoading(false);

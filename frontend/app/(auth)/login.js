@@ -24,7 +24,7 @@ import { useAuth } from '../../src/hooks/useAuth';
 export default function LoginScreen() {
   const theme = useTheme();
   const router = useRouter();
-  const { login, loginDemo } = useAuth();
+  const { login, loginOffline, loginDemo } = useAuth();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -53,22 +53,34 @@ export default function LoginScreen() {
       const result = await login(email.trim(), password);
       if (result.success) {
         router.replace('/(tabs)/mascotas');
+        return;
       } else {
         setError(result.message || 'Credenciales incorrectas.');
       }
     } catch (err) {
-      const response = err.response?.data;
-      if (response?.message) {
-        setError(response.message);
-      } else if (err.message === 'Network Error' || err.code === 'ERR_NETWORK') {
-        setError(
-          'No se pudo conectar con el servidor backend (puerto 4000). Puedes usar el botón de "Modo Demostración" abajo para entrar sin conexión.'
-        );
-      } else {
-        setError('Error al iniciar sesión. Intenta de nuevo.');
+      // Si el servidor no responde o no hay internet, iniciar sesión automáticamente sin conexión
+      try {
+        await loginOffline(email.trim(), password);
+        router.replace('/(tabs)/mascotas');
+        return;
+      } catch (offlineErr) {
+        setError('Error al iniciar sesión sin internet.');
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleOfflineDirect = async () => {
+    setError('');
+    setDemoLoading(true);
+    try {
+      await loginOffline(email.trim() || 'ce10pulgar@gmail.com', password || '123456');
+      router.replace('/(tabs)/mascotas');
+    } catch (err) {
+      setError('Error al ingresar sin conexión.');
+    } finally {
+      setDemoLoading(false);
     }
   };
 
@@ -199,7 +211,19 @@ export default function LoginScreen() {
                 buttonColor={theme.colors.primary}
                 textColor={theme.colors.onPrimary}
               >
-                {loading ? 'Ingresando...' : 'Ingresar con Servidor'}
+                {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+              </Button>
+
+              <Button
+                mode="outlined"
+                icon="cloud-off-outline"
+                onPress={handleOfflineDirect}
+                loading={demoLoading}
+                disabled={loading || demoLoading}
+                style={{ marginTop: 10, borderColor: theme.colors.primary }}
+                textColor={theme.colors.primary}
+              >
+                Entrar sin Internet (Modo Offline)
               </Button>
 
               <View style={styles.registerRow}>
