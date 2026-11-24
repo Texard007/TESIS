@@ -12,8 +12,9 @@ import {
   TextInput,
   Button,
   Card,
+  Chip,
+  Divider,
   useTheme,
-  HelperText,
 } from 'react-native-paper';
 import { useRouter, Link } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -22,12 +23,13 @@ import { useAuth } from '../../src/hooks/useAuth';
 export default function LoginScreen() {
   const theme = useTheme();
   const router = useRouter();
-  const { login } = useAuth();
+  const { login, loginDemo } = useAuth();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [demoLoading, setDemoLoading] = useState(false);
   const [error, setError] = useState('');
 
   const { width } = Dimensions.get('window');
@@ -51,20 +53,34 @@ export default function LoginScreen() {
       if (result.success) {
         router.replace('/(tabs)/mascotas');
       } else {
-        // Manejar mensajes de error incluyendo intentos restantes y bloqueo
         setError(result.message || 'Credenciales incorrectas.');
       }
     } catch (err) {
       const response = err.response?.data;
       if (response?.message) {
         setError(response.message);
-      } else if (err.message === 'Network Error') {
-        setError('Error de conexión. Verifica tu conexión a internet.');
+      } else if (err.message === 'Network Error' || err.code === 'ERR_NETWORK') {
+        setError(
+          'No se pudo conectar con el servidor backend (puerto 4000). Puedes usar el botón de "Modo Demostración" abajo para entrar sin conexión.'
+        );
       } else {
         setError('Error al iniciar sesión. Intenta de nuevo.');
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDemoAccess = async (rol) => {
+    setError('');
+    setDemoLoading(true);
+    try {
+      await loginDemo(rol);
+      router.replace('/(tabs)/mascotas');
+    } catch (err) {
+      setError('Error al iniciar el modo demostración.');
+    } finally {
+      setDemoLoading(false);
     }
   };
 
@@ -98,14 +114,14 @@ export default function LoginScreen() {
               variant="bodyLarge"
               style={[styles.subtitle, { color: theme.colors.onSurfaceVariant }]}
             >
-              Plataforma colaborativa del estado Zulia
+              Comunidades de Adopción • Estado Zulia
             </Text>
           </View>
 
-          {/* Formulario */}
+          {/* Formulario de Login */}
           <Card
             style={[styles.card, { backgroundColor: theme.colors.surface }]}
-            elevation={2}
+            elevation={3}
           >
             <Card.Content style={styles.cardContent}>
               <Text
@@ -148,7 +164,7 @@ export default function LoginScreen() {
                 style={styles.input}
                 outlineColor={theme.colors.outline}
                 activeOutlineColor={theme.colors.primary}
-                disabled={loading}
+                disabled={loading || demoLoading}
               />
 
               <TextInput
@@ -168,7 +184,7 @@ export default function LoginScreen() {
                 style={styles.input}
                 outlineColor={theme.colors.outline}
                 activeOutlineColor={theme.colors.primary}
-                disabled={loading}
+                disabled={loading || demoLoading}
                 onSubmitEditing={handleLogin}
               />
 
@@ -176,13 +192,13 @@ export default function LoginScreen() {
                 mode="contained"
                 onPress={handleLogin}
                 loading={loading}
-                disabled={loading}
+                disabled={loading || demoLoading}
                 style={styles.loginButton}
                 contentStyle={styles.loginButtonContent}
                 buttonColor={theme.colors.primary}
                 textColor={theme.colors.onPrimary}
               >
-                {loading ? 'Ingresando...' : 'Ingresar'}
+                {loading ? 'Ingresando...' : 'Ingresar con Servidor'}
               </Button>
 
               <View style={styles.registerRow}>
@@ -202,6 +218,70 @@ export default function LoginScreen() {
                   </Button>
                 </Link>
               </View>
+
+              <Divider style={{ marginVertical: 18 }} />
+
+              {/* Acceso Rápido / Modo Demo Offline */}
+              <View style={styles.demoSection}>
+                <View style={styles.demoHeader}>
+                  <MaterialCommunityIcons
+                    name="lightning-bolt"
+                    size={20}
+                    color="#FF9800"
+                  />
+                  <Text
+                    variant="labelLarge"
+                    style={{ fontWeight: '700', color: theme.colors.onSurface }}
+                  >
+                    Acceso Rápido (Modo Demo / Sin Servidor)
+                  </Text>
+                </View>
+                <Text
+                  variant="bodySmall"
+                  style={{ color: theme.colors.onSurfaceVariant, marginBottom: 12, textAlign: 'center' }}
+                >
+                  Toca un rol para ingresar al instante y probar la app:
+                </Text>
+
+                <View style={styles.chipsGrid}>
+                  <Chip
+                    icon="account-heart"
+                    mode="outlined"
+                    style={styles.demoChip}
+                    onPress={() => handleDemoAccess('adoptante')}
+                    disabled={loading || demoLoading}
+                  >
+                    Adoptante
+                  </Chip>
+                  <Chip
+                    icon="hand-heart"
+                    mode="outlined"
+                    style={styles.demoChip}
+                    onPress={() => handleDemoAccess('rescatista')}
+                    disabled={loading || demoLoading}
+                  >
+                    Rescatista
+                  </Chip>
+                  <Chip
+                    icon="medical-bag"
+                    mode="outlined"
+                    style={styles.demoChip}
+                    onPress={() => handleDemoAccess('veterinario')}
+                    disabled={loading || demoLoading}
+                  >
+                    Veterinario
+                  </Chip>
+                  <Chip
+                    icon="shield-crown"
+                    mode="outlined"
+                    style={styles.demoChip}
+                    onPress={() => handleDemoAccess('administrador')}
+                    disabled={loading || demoLoading}
+                  >
+                    Admin
+                  </Chip>
+                </View>
+              </View>
             </Card.Content>
           </Card>
         </View>
@@ -215,6 +295,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'center',
     padding: 16,
+    paddingVertical: 32,
   },
   content: {
     width: '100%',
@@ -226,7 +307,7 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    marginBottom: 32,
+    marginBottom: 24,
   },
   title: {
     fontWeight: '700',
@@ -274,7 +355,30 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 16,
+    marginTop: 12,
     flexWrap: 'wrap',
+  },
+  demoSection: {
+    backgroundColor: '#FFF8E1',
+    borderRadius: 12,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: '#FFE082',
+  },
+  demoHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    marginBottom: 6,
+  },
+  chipsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    justifyContent: 'center',
+  },
+  demoChip: {
+    backgroundColor: '#FFFFFF',
   },
 });
